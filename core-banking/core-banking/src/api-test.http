@@ -7,3 +7,14 @@ Content-Type: application/json
   "email": "ignacio@admin.com",
   "password": "mi_password_seguro_123"
 }
+
+###
+
+### 2. Login de Usuario (Conseguir el Token)
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+
+{
+  "email": "ignacio@admin.com",
+  "password": "mi_password_seguro_123"
+}
