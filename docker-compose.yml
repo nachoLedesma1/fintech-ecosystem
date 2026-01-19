@@ -1,0 +1,36 @@
+services:
+  #Base de Datos Principal
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: fintech-postgres
+    ports:
+      - "5433:5432" # Puerto PC : Puerto Contenedor
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin123
+      - POSTGRES_DB=core_banking_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persistencia (para no perder datos al apagar)
+    networks:
+      - fintech-network
+
+  # Interfaz Gráfica para ver la DB
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: fintech-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres-db
+    networks:
+      - fintech-network
+
+volumes:
+  postgres_data:
+
+networks:
+  fintech-network:
+    driver: bridge
