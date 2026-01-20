@@ -1,8 +1,10 @@
 package com.bank.core_banking.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal; // IMPORTANTE: Usamos BigDecimal para dinero
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "accounts")
@@ -17,17 +19,29 @@ public class Account {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String cbu; // Clave Bancaria Uniforme (Identificador único)
+    @Column(unique = true, nullable = false, length = 22)
+    private String cbu; // Clave Bancaria Uniforme
+
+    @Enumerated(EnumType.STRING)
+    private Currency currency; // ARS o USD
 
     @Column(nullable = false)
-    private String currency; // "ARS", "USD"
+    private BigDecimal balance; // BigDecimal es obligatorio para dinero
 
     @Column(nullable = false)
-    private BigDecimal balance; // NUNCA usar Double para dinero.
+    private BigDecimal transactionLimit; // Límite de extracción
 
-    // Relación: Una cuenta pertenece a Un usuario
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    // Muchas cuentas pertenecen a Un usuario
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id") // Esta será la Foreign Key en la tabla accounts
+    @JsonIgnore // Evita bucles infinitos al convertir a JSON
     private User user;
 }

@@ -18,3 +18,16 @@ Content-Type: application/json
   "email": "ignacio@admin.com",
   "password": "mi_password_seguro_123"
 }
+
+### Crear Cuenta Bancaria
+POST http://localhost:8080/accounts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2ODk0NTc1OSwiZXhwIjoxNzY5MDMyMTU5fQ.kha6hnj33AbqAo597VUwOE0ELXz4PozqRJ_PLfggA7k
+
+{
+  "currency": "ARS"
+}
+
+### Ver mis Cuentas (Consultar Saldo)
+GET http://localhost:8080/accounts
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2ODk0NjI0OSwiZXhwIjoxNzY5MDMyNjQ5fQ.8L_ZpEkmLoJ10muYY3yKeq9iVWDmlxLG-MRWc6VB7hY
