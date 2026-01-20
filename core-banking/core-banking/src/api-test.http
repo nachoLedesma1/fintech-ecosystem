@@ -25,7 +25,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2ODk0NTc1OSwiZXhwIjoxNzY5MDMyMTU5fQ.kha6hnj33AbqAo597VUwOE0ELXz4PozqRJ_PLfggA7k
 
 {
-  "currency": "ARS"
+  "currency": "USD"
 }
 
 ### Ver mis Cuentas (Consultar Saldo)
@@ -40,4 +40,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsI
 {
   "cbu": "1768945902491129386148",
   "amount": 500.00
+}
+
+### 1. Transferir Dinero
+POST http://localhost:8080/transactions/transfer
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2ODk1MDY3MywiZXhwIjoxNzY5MDM3MDczfQ.LGxqKrPOu5WKW9gV165AdxSiaDCpBrI_6QC78JxAWkE
+
+{
+  "sourceCbu": "1768945902491129386148",
+  "destinationCbu": "1768949494197346134556",
+  "amount": 100.00
 }
