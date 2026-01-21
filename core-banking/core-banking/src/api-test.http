@@ -50,7 +50,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsI
 {
   "sourceCbu": "1768945902491129386148",
   "destinationCbu": "1768949494197346134556",
-  "amount": 100.00
+  "amount": 10000000.00
 }
 
 ### Ver Historial de Transacciones
