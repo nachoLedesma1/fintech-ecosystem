@@ -64,11 +64,11 @@ public class TransactionService {
             throw new RuntimeException("No eres el dueño de la cuenta de origen");
         }
 
-        //Buscar cuenta destino
-        Account destinationAccount = accountRepository.findAll().stream()
-                .filter(a -> a.getCbu().equals(request.getDestinationCbu()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Cuenta de destino no encontrada"));
+        // Buscar cuenta destino (Soporta CBU o ALIAS)
+        String target = request.getDestinationCbu(); // El usuario puede enviar CBU o Alias aquí
+
+        Account destinationAccount = accountRepository.findByCbuOrAlias(target, target)
+                .orElseThrow(() -> new RuntimeException("Cuenta de destino no encontrada (CBU o Alias inválido)"));
 
         // Validar saldo suficiente
         if (sourceAccount.getBalance().compareTo(request.getAmount()) < 0) {
@@ -123,6 +123,32 @@ public class TransactionService {
 
         //Devolver historial
         return transactionRepository.findByAccountIdOrderByTimestampDesc(account.getId());
+    }
+
+    public void setAlias(String cbu, String alias, String userEmail) {
+        //Validar formato del alias (ej: letras y puntos)
+        if (!alias.matches("^[a-zA-Z0-9.]+$")) {
+            throw new RuntimeException("El alias solo puede tener letras, números y puntos");
+        }
+
+        //Buscar la cuenta y validar dueño
+        Account account = accountRepository.findAll().stream()
+                .filter(a -> a.getCbu().equals(cbu))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
+
+        if (!account.getUser().getEmail().equals(userEmail)) {
+            throw new RuntimeException("No eres el dueño de la cuenta");
+        }
+
+        // Verificar que el alias no esté ocupado por OTRO
+        if (accountRepository.findByAlias(alias).isPresent()) {
+            throw new RuntimeException("El alias ya está en uso");
+        }
+
+        //Guardar
+        account.setAlias(alias);
+        accountRepository.save(account);
     }
 
 }

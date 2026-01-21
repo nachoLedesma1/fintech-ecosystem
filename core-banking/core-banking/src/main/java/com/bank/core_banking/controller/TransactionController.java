@@ -2,6 +2,7 @@ package com.bank.core_banking.controller;
 
 import com.bank.core_banking.dto.TransactionRequest;
 import com.bank.core_banking.dto.TransferRequest;
+import com.bank.core_banking.dto.AliasRequest;
 import com.bank.core_banking.model.Transaction;
 import com.bank.core_banking.service.TransactionService;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,12 @@ public class TransactionController {
                                                   Authentication authentication){
 
         return transactionService.getHistory(cbu, authentication.getName());
+    }
+
+    @PutMapping("/alias")
+    public ResponseEntity<String> updateAlias(@RequestBody AliasRequest request, Authentication auth) {
+        transactionService.setAlias(request.getCbu(), request.getAlias(), auth.getName());
+        return ResponseEntity.ok("Alias actualizado correctamente");
     }
 
 }

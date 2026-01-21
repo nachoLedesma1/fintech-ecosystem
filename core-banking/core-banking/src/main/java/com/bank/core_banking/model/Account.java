@@ -22,6 +22,9 @@ public class Account {
     @Column(unique = true, nullable = false, length = 22)
     private String cbu; // Clave Bancaria Uniforme
 
+    @Column(unique = true)
+    private String alias; // Nuevo campo
+
     @Enumerated(EnumType.STRING)
     private Currency currency; // ARS o USD
 

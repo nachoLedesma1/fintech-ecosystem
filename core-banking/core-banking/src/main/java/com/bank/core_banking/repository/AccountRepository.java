@@ -14,4 +14,10 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     boolean existsByCbu(String cbu);
 
     List<Account> findByUserId(Long userId);
+
+    java.util.Optional<Account> findByAlias(String alias);
+
+    //Buscar por CBU *O* por Alias
+    java.util.Optional<Account> findByCbuOrAlias(String cbu, String alias);
+
 }
