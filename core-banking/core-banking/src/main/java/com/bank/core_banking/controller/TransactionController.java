@@ -29,4 +29,11 @@ public class TransactionController {
         return ResponseEntity.ok("Transferencia exitosa");
     }
 
+    @GetMapping("/{cbu}")
+    public java.util.List<Transaction> getHistory(@PathVariable String cbu,
+                                                  Authentication authentication){
+
+        return transactionService.getHistory(cbu, authentication.getName());
+    }
+
 }

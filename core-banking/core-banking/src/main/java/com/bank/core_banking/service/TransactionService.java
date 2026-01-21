@@ -109,4 +109,20 @@ public class TransactionService {
         transactionRepository.save(creditTx);
     }
 
+    public java.util.List<Transaction> getHistory(String cbu, String userEmail) {
+        // Buscar la cuenta
+        Account account = accountRepository.findAll().stream()
+                .filter(a -> a.getCbu().equals(cbu))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Cuenta no encontrada"));
+
+        //Validar que la cuenta sea del usuario logueado
+        if (!account.getUser().getEmail().equals(userEmail)) {
+            throw new RuntimeException("No tienes permiso para ver esta cuenta");
+        }
+
+        //Devolver historial
+        return transactionRepository.findByAccountIdOrderByTimestampDesc(account.getId());
+    }
+
 }
