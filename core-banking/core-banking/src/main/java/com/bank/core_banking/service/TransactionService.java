@@ -1,5 +1,6 @@
 package com.bank.core_banking.service;
 
+import com.bank.core_banking.dto.EmailRequest;
 import com.bank.core_banking.dto.TransactionRequest;
 import com.bank.core_banking.dto.TransferRequest;
 import com.bank.core_banking.model.Account;
@@ -7,9 +8,12 @@ import com.bank.core_banking.model.Transaction;
 import com.bank.core_banking.model.TransactionType;
 import com.bank.core_banking.repository.AccountRepository;
 import com.bank.core_banking.repository.TransactionRepository;
+import org.springframework.web.client.RestClient;
+import org.springframework.http.MediaType;
 import jakarta.transaction.Transactional; // Asegura que todo pase o nada pase
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 
 import java.math.BigDecimal;
 
@@ -19,6 +23,8 @@ public class TransactionService {
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    //creamos cliente nativo
+    private final RestClient restClient = RestClient.create();
 
     @Transactional // Si algo falla en medio, se hace rollback
     public Transaction deposit(TransactionRequest request) {
@@ -107,6 +113,31 @@ public class TransactionService {
         accountRepository.save(destinationAccount);
         transactionRepository.save(debitTx);
         transactionRepository.save(creditTx);
+
+        //servicio de notifiaciones
+        try {
+            // 1. Preparamos los datos
+            String nombreDestino = destinationAccount.getAlias() != null
+                    ? destinationAccount.getAlias()       // Si tiene alias, úsalo
+                    : destinationAccount.getCbu();
+            EmailRequest email = new EmailRequest();
+            email.setTo(sourceAccount.getUser().getEmail());//estaba "nacho@mail.com" en vez de lo que está ahora
+            email.setSubject("Transferencia Exitosa");
+            email.setBody("Has transferido $" + request.getAmount() + " a " + nombreDestino);
+
+            // 2. Hacemos la llamada HTTP manual al puerto 8081
+            restClient.post()
+                    .uri("http://localhost:8081/notifications/send")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(email)
+                    .retrieve()
+                    .toBodilessEntity(); // "Manda y olvida" (No esperamos respuesta)
+
+        } catch (Exception e) {
+            System.err.println("⚠️ No se pudo enviar la notificación: " + e.getMessage());
+        }
+
+
     }
 
     public java.util.List<Transaction> getHistory(String cbu, String userEmail) {
