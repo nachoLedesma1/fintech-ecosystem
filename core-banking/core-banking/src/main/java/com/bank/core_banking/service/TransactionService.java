@@ -1,5 +1,6 @@
 package com.bank.core_banking.service;
 
+import com.bank.core_banking.dto.AuditRequest;
 import com.bank.core_banking.dto.EmailRequest;
 import com.bank.core_banking.dto.TransactionRequest;
 import com.bank.core_banking.dto.TransferRequest;
@@ -116,7 +117,7 @@ public class TransactionService {
 
         //servicio de notifiaciones
         try {
-            // 1. Preparamos los datos
+            //Preparamos los datos
             String nombreDestino = destinationAccount.getAlias() != null
                     ? destinationAccount.getAlias()       // Si tiene alias, úsalo
                     : destinationAccount.getCbu();
@@ -125,7 +126,7 @@ public class TransactionService {
             email.setSubject("Transferencia Exitosa");
             email.setBody("Has transferido $" + request.getAmount() + " a " + nombreDestino);
 
-            // 2. Hacemos la llamada HTTP manual al puerto 8081
+            // Hacemos la llamada HTTP manual al puerto 8081
             restClient.post()
                     .uri("http://localhost:8081/notifications/send")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -137,6 +138,26 @@ public class TransactionService {
             System.err.println("⚠️ No se pudo enviar la notificación: " + e.getMessage());
         }
 
+        //acá van los logs
+        try {
+            String nombreDestino = destinationAccount.getAlias() != null
+                    ? destinationAccount.getAlias()       // Si tiene alias, úsalo
+                    : destinationAccount.getCbu();
+            AuditRequest audit = new AuditRequest();
+            audit.setEventType("TRANSFERENCIA_ENVIADA");
+            audit.setUsername(sourceAccount.getUser().getUsername()); // O getEmail()
+            audit.setMessage("Transferencia exitosa de $" + request.getAmount() + " a " + nombreDestino);
+
+            restClient.post()
+                    .uri("http://localhost:8082/audit")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(audit)
+                    .retrieve()
+                    .toBodilessEntity();
+
+        } catch (Exception e) {
+            System.err.println("⚠️ No se pudo guardar auditoría: " + e.getMessage());
+        }
 
     }
 
