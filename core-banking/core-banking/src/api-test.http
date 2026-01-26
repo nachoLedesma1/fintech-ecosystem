@@ -1,5 +1,5 @@
 ### Registro de Usuario
-POST http://localhost:8080/auth/register
+POST http://localhost:8080/api/core/auth/register
 Content-Type: application/json
 
 {
@@ -11,7 +11,7 @@ Content-Type: application/json
 ###
 
 ### 2. Login de Usuario (Conseguir el Token)
-POST http://localhost:8080/auth/login
+POST http://127.0.0.1:8080/api/core/auth/login
 Content-Type: application/json
 
 {
@@ -33,9 +33,9 @@ GET http://localhost:8080/accounts
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2ODk0NjI0OSwiZXhwIjoxNzY5MDMyNjQ5fQ.8L_ZpEkmLoJ10muYY3yKeq9iVWDmlxLG-MRWc6VB7hY
 
 ### Depositar Dinero
-POST http://localhost:8080/transactions/deposit
+POST http://127.0.0.1:8080/api/core/transactions/deposit
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2ODk0ODI2OSwiZXhwIjoxNzY5MDM0NjY5fQ.0x50U6hDeD3EgKlKp1gJbM_zhry57kMoQzTMjJyGXf4
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2OTQ2NjUwNSwiZXhwIjoxNzY5NTUyOTA1fQ.nw4eylNtQDu5y8fiWJ5vASsYwO5X0JAWwxAuygQ7D88
 
 {
   "cbu": "1768945902491129386148",
@@ -43,14 +43,14 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsI
 }
 
 ### 1. Transferir Dinero
-POST http://localhost:8080/transactions/transfer
+POST http://localhost:8080/api/core/transactions/transfer
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2ODk1MDY3MywiZXhwIjoxNzY5MDM3MDczfQ.LGxqKrPOu5WKW9gV165AdxSiaDCpBrI_6QC78JxAWkE
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2OTQ2NjUwNSwiZXhwIjoxNzY5NTUyOTA1fQ.nw4eylNtQDu5y8fiWJ5vASsYwO5X0JAWwxAuygQ7D88
 
 {
   "sourceCbu": "1768945902491129386148",
   "destinationCbu": "1768949494197346134556",
-  "amount": 10000000.00
+  "amount": 1.00
 }
 
 ### Ver Historial de Transacciones

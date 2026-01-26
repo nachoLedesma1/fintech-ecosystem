@@ -1,0 +1,32 @@
+server:
+  port: 8080 # El Gateway tomará el puerto principal (el que usaba el Core antes)
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # Ruta al core banking
+        - id: core-banking
+          uri: ${CORE_URL:http://localhost:8090} # Si no hay variable, usa localhost
+          predicates:
+            - Path=/api/core/**
+          filters:
+            - StripPrefix=2 # Quita "/api/core" antes de mandar la petición
+
+        # Ruta audit-service
+        - id: audit-service
+          uri: ${AUDIT_URL:http://localhost:8082}
+          predicates:
+            - Path=/api/audit/**
+          filters:
+            - StripPrefix=2
+
+        #Ruta notification-service
+        - id: notification-service
+          uri: ${NOTIFICATION_URL:http://localhost:8083}
+          predicates:
+            - Path=/api/notification/**
+          filters:
+            - StripPrefix=2

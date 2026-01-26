@@ -30,6 +30,21 @@ services:
 
   # Microservicios java
 
+  api-gateway:
+    build: ./api-gateway 
+    container_name: api-gateway
+    ports:
+      - "8080:8080" # Expuesto al mundo
+    environment:
+      # URLs internas de Docker
+      - CORE_URL=http://core-banking:8090
+      - AUDIT_URL=http://audit-service:8082
+    depends_on:
+      - core-banking
+      - audit-service
+    networks:
+      - fintech-network
+
   notification-service:
     build: ./notification-service/notification-service
     container_name: notification-service
@@ -57,8 +72,9 @@ services:
     build: ./core-banking/core-banking
     container_name: core-banking
     ports:
-      - "8080:8080"
+      - "8090:8090"
     environment:
+      - SERVER_PORT=8090
       - DB_URL=jdbc:postgresql://postgres-db:5432/core_banking_db
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin123
