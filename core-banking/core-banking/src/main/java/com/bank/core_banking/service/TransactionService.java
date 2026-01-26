@@ -10,6 +10,7 @@ import com.bank.core_banking.model.TransactionType;
 import com.bank.core_banking.repository.AccountRepository;
 import com.bank.core_banking.repository.TransactionRepository;
 import org.springframework.web.client.RestClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import jakarta.transaction.Transactional; // Asegura que todo pase o nada pase
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,13 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     //creamos cliente nativo
     private final RestClient restClient = RestClient.create();
+
+    //inyeccion de variables desde application.properties
+    @Value("${notification.service.url}")
+    private String notificationUrl;
+
+    @Value("${audit.service.url}")
+    private String auditUrl;
 
     @Transactional // Si algo falla en medio, se hace rollback
     public Transaction deposit(TransactionRequest request) {
@@ -54,7 +62,7 @@ public class TransactionService {
         return transaction;
     }
 
-    @Transactional // ¡CRUCIAL! Si falla la suma al destino, se deshace la resta al origen.
+    @Transactional // Si falla la suma al destino, se deshace la resta al origen.
     public void transfer(TransferRequest request, String userEmail) {
         // Validar que el monto sea positivo
         if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
@@ -128,7 +136,7 @@ public class TransactionService {
 
             // Hacemos la llamada HTTP manual al puerto 8081
             restClient.post()
-                    .uri("http://localhost:8081/notifications/send")
+                    .uri(notificationUrl + "/notifications/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(email)
                     .retrieve()
@@ -149,7 +157,7 @@ public class TransactionService {
             audit.setMessage("Transferencia exitosa de $" + request.getAmount() + " a " + nombreDestino);
 
             restClient.post()
-                    .uri("http://localhost:8082/audit")
+                    .uri(auditUrl + "/audit")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(audit)
                     .retrieve()

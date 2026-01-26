@@ -28,6 +28,50 @@ services:
     networks:
       - fintech-network
 
+  # Microservicios java
+
+  notification-service:
+    build: ./notification-service/notification-service
+    container_name: notification-service
+    ports:
+      - "8081:8081"
+    networks:
+      - fintech-network
+
+  audit-service:
+    build: ./audit-service/audit-service
+    container_name: audit-service
+    ports:
+      - "8082:8082"
+    environment:
+      # OJO: Dentro de la red Docker usamos el puerto interno 5432 y el host 'postgres-db'
+      - DB_URL=jdbc:postgresql://postgres-db:5432/audit_db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin123
+    depends_on:
+      - postgres-db
+    networks:
+      - fintech-network
+
+  core-banking:
+    build: ./core-banking/core-banking
+    container_name: core-banking
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_URL=jdbc:postgresql://postgres-db:5432/core_banking_db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin123
+      # Aquí le decimos dónde están sus hermanos
+      - NOTIFICATION_URL=http://notification-service:8081
+      - AUDIT_URL=http://audit-service:8082
+    depends_on:
+      - postgres-db
+      - notification-service
+      - audit-service
+    networks:
+      - fintech-network
+
 volumes:
   postgres_data:
 
