@@ -1,5 +1,5 @@
 server:
-  port: 8080 # El Gateway tomará el puerto principal (el que usaba el Core antes)
+  port: 8080
 
 spring:
   application:
@@ -7,26 +7,73 @@ spring:
   cloud:
     gateway:
       routes:
-        # Ruta al core banking
+        # Rutas de negocio (Tus APIs normales)
+
+
+        # Core Banking
         - id: core-banking
-          uri: ${CORE_URL:http://localhost:8090} # Si no hay variable, usa localhost
+          uri: http://core-banking:8090
           predicates:
             - Path=/api/core/**
           filters:
-            - StripPrefix=2 # Quita "/api/core" antes de mandar la petición
+            - StripPrefix=2
 
-        # Ruta audit-service
+        # Audit Service
         - id: audit-service
-          uri: ${AUDIT_URL:http://localhost:8082}
+          uri: http://audit-service:8082
           predicates:
             - Path=/api/audit/**
           filters:
             - StripPrefix=2
 
-        #Ruta notification-service
+        # Notification Service
         - id: notification-service
-          uri: ${NOTIFICATION_URL:http://localhost:8083}
+          uri: http://notification-service:8081
           predicates:
             - Path=/api/notification/**
           filters:
             - StripPrefix=2
+
+        # Rutas para Swagger (OPENAPI)
+        # Estas rutas sirven para que el Gateway "robe" el JSON de documentación
+        # de cada microservicio y se lo muestre a la UI central.
+
+
+        # Documentacion del Core
+        - id: openapi-core
+          uri: http://core-banking:8090
+          predicates:
+            - Path=/v3/api-docs/core
+          filters:
+            - RewritePath=/v3/api-docs/core, /v3/api-docs
+
+        # Documentacion de Audit
+        - id: openapi-audit
+          uri: http://audit-service:8082
+          predicates:
+            - Path=/v3/api-docs/audit
+          filters:
+            - RewritePath=/v3/api-docs/audit, /v3/api-docs
+
+        # Documentacion de Notification
+        - id: openapi-notification
+          uri: http://notification-service:8081
+          predicates:
+            - Path=/v3/api-docs/notification
+          filters:
+            - RewritePath=/v3/api-docs/notification, /v3/api-docs
+
+
+# configuracion de swagger
+# (Nota que 'springdoc' está pegado al margen izquierdo)
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    urls:
+      - name: Core Banking
+        url: /v3/api-docs/core
+      - name: Audit Service
+        url: /v3/api-docs/audit
+      - name: Notification Service
+        url: /v3/api-docs/notification
