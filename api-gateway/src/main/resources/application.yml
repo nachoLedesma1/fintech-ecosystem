@@ -8,66 +8,72 @@ spring:
     gateway:
       routes:
         # Rutas de negocio (Tus APIs normales)
-
+        globalcors:
+          cors-configurations:
+            '[/**]':
+              allowedOrigins: "*"   # Permite todo (Frontend, Postman, etc)
+              allowedMethods: "*"   # Permite GET, POST, PUT, DELETE
+              allowedHeaders: "*"   # Permite Authorization, Content-Type
 
         # Core Banking
-        - id: core-banking
-          uri: http://core-banking:8090
-          predicates:
-            - Path=/api/core/**
-          filters:
-            - StripPrefix=2
+        routes:
+          - id: core-banking
+            uri: http://core-banking:8090
+            predicates:
+              - Path=/api/core/**
+            filters:
+              - StripPrefix=2
 
-        # Audit Service
-        - id: audit-service
-          uri: http://audit-service:8082
-          predicates:
-            - Path=/api/audit/**
-          filters:
-            - StripPrefix=2
+          # Audit Service
+          - id: audit-service
+            uri: http://audit-service:8082
+            predicates:
+              - Path=/api/audit/**
+            filters:
+              - StripPrefix=2
 
-        # Notification Service
-        - id: notification-service
-          uri: http://notification-service:8081
-          predicates:
-            - Path=/api/notification/**
-          filters:
-            - StripPrefix=2
+          # Notification Service
+          - id: notification-service
+            uri: http://notification-service:8081
+            predicates:
+              - Path=/api/notification/**
+            filters:
+              - StripPrefix=2
 
-        # Rutas para Swagger (OPENAPI)
-        # Estas rutas sirven para que el Gateway "robe" el JSON de documentación
-        # de cada microservicio y se lo muestre a la UI central.
+          # Rutas para Swagger (OPENAPI)
+          # Estas rutas sirven para que el Gateway "robe" el JSON de documentación
+          # de cada microservicio y se lo muestre a la UI central.
 
 
-        # Documentacion del Core
-        - id: openapi-core
-          uri: http://core-banking:8090
-          predicates:
-            - Path=/v3/api-docs/core
-          filters:
-            - RewritePath=/v3/api-docs/core, /v3/api-docs
+          # Documentacion del Core
+          - id: openapi-core
+            uri: http://core-banking:8090
+            predicates:
+              - Path=/v3/api-docs/core
+            filters:
+              - RewritePath=/v3/api-docs/core, /v3/api-docs
 
-        # Documentacion de Audit
-        - id: openapi-audit
-          uri: http://audit-service:8082
-          predicates:
-            - Path=/v3/api-docs/audit
-          filters:
-            - RewritePath=/v3/api-docs/audit, /v3/api-docs
+          # Documentacion de Audit
+          - id: openapi-audit
+            uri: http://audit-service:8082
+            predicates:
+              - Path=/v3/api-docs/audit
+            filters:
+              - RewritePath=/v3/api-docs/audit, /v3/api-docs
 
-        # Documentacion de Notification
-        - id: openapi-notification
-          uri: http://notification-service:8081
-          predicates:
-            - Path=/v3/api-docs/notification
-          filters:
-            - RewritePath=/v3/api-docs/notification, /v3/api-docs
+          # Documentacion de Notification
+          - id: openapi-notification
+            uri: http://notification-service:8081
+            predicates:
+              - Path=/v3/api-docs/notification
+            filters:
+              - RewritePath=/v3/api-docs/notification, /v3/api-docs
 
-        # admin route
-        - id: admin-route
-          uri: http://core-banking:8090
-          predicates:
-            - Path=/api/admin/**
+          # admin route
+          - id: admin-route
+            uri: http://core-banking:8090
+            predicates:
+              - Path=/api/admin/**
 
 
 # configuracion de swagger

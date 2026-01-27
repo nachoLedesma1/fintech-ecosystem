@@ -2,7 +2,10 @@ package com.bank.core_banking.controller;
 
 import com.bank.core_banking.dto.CreateAccountRequest;
 import com.bank.core_banking.dto.AliasRequest;
+import com.bank.core_banking.dto.AccountResponseDTO;
 import com.bank.core_banking.model.Account;
+import com.bank.core_banking.model.User;
+import com.bank.core_banking.repository.AccountRepository;
 import com.bank.core_banking.service.AccountService;
 import com.bank.core_banking.service.TransactionService;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ public class AccountController {
 
     private final AccountService accountService;
     private final TransactionService transactionService;
+    private final AccountRepository accountRepository;
 
     @PostMapping
     public Account createAccount(@RequestBody CreateAccountRequest request, Authentication authentication) {
@@ -25,10 +29,10 @@ public class AccountController {
         return accountService.createAccount(request, authentication.getName());
     }
 
-    @GetMapping
+    /*@GetMapping
     public java.util.List<Account> getMyAccounts(Authentication authentication) {
         return accountService.getMyAccounts(authentication.getName());
-    }
+    }*/
 
     @PutMapping("/alias")
     public ResponseEntity<String> setAlias(@RequestBody AliasRequest request,
@@ -38,5 +42,19 @@ public class AccountController {
         return ResponseEntity.ok("Alias creado exitosamente: " + request.getAlias());
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<List<AccountResponseDTO>> getMyAccounts(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+
+        // Buscamos las cuentas del ID del usuario logueado
+        List<Account> accounts = accountRepository.findByUserId(user.getId());
+
+        // Convertimos a DTO (Asumiendo que tienes un mapper o constructor)
+        List<AccountResponseDTO> dtos = accounts.stream()
+                .map(AccountResponseDTO::new)
+                .toList();
+
+        return ResponseEntity.ok(dtos);
+    }
 
 }
