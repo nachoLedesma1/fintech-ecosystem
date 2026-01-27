@@ -1,5 +1,6 @@
 package com.bank.core_banking.config;
 
+import com.bank.core_banking.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -21,7 +22,15 @@ public class JwtService {
 
     //Generar Token (Público)
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+
+        User user = (User) userDetails;
+
+        // Agregamos el rol al mapa de "claims" (datos extra)
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("role", user.getRole().name()); // Ej: "ADMIN"
+
+        return generateToken(extraClaims, userDetails);
+
     }
 
     //Generar Token con Claims extra (Privado)

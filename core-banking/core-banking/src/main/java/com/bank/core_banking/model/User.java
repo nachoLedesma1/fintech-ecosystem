@@ -32,9 +32,13 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    // Aquí guardaremos "ROLE_ADMIN" o "ROLE_USER"
-    // Lo simplificamos así para no crear otra tabla de roles por ahora
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public enum Role {
+        USER,
+        ADMIN
+    }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Account> accounts;
@@ -42,8 +46,8 @@ public class User implements UserDetails {
     //Métodos de user details
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Convierte tu String "role" en un permiso real de Spring
-        return List.of(new SimpleGrantedAuthority(role));
+        // Spring espera que los roles empiecen con "ROLE_" para usar hasRole()
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override

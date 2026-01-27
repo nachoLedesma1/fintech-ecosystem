@@ -63,6 +63,12 @@ spring:
           filters:
             - RewritePath=/v3/api-docs/notification, /v3/api-docs
 
+        # admin route
+        - id: admin-route
+          uri: http://core-banking:8090
+          predicates:
+            - Path=/api/admin/**
+
 
 # configuracion de swagger
 # (Nota que 'springdoc' está pegado al margen izquierdo)
