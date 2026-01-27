@@ -13,22 +13,32 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
+                contact = @Contact(
+                        name = "Ignacio Ledesma",
+                        email = "nacholedesma2@gmail.com",
+                        url = "https://github.com/nachoLedesma1"
+                ),
+                description = "Documentación de la API de Core Banking (Fintech Ecosystem)",
                 title = "Core Banking API",
-                version = "1.0",
-                description = "Documentación del Microservicio de Core Banking",
-                contact = @Contact(name = "Ignacio Ledesma", email = "nacho@banking.com")
+                version = "1.0"
         ),
         servers = {
                 @Server(
-                        url = "http://localhost:8080/api/core",
-                        description = "Servidor Gateway (Público)"
+                        description = "Local ENV",
+                        url = "http://localhost:8090" // URL directa al microservicio
+                ),
+                @Server(
+                        description = "Gateway ENV",
+                        url = "http://localhost:8080/api/core" // URL a través del Gateway
                 )
         },
-        security = @SecurityRequirement(name = "bearerAuth") // Aplica seguridad a todo
+        security = {
+                @SecurityRequirement(name = "bearerAuth") // Aplica seguridad a todo por defecto
+        }
 )
 @SecurityScheme(
         name = "bearerAuth",
-        description = "Autenticación JWT (Copia el token del login y pégalo aquí)",
+        description = "JWT auth description",
         scheme = "bearer",
         type = SecuritySchemeType.HTTP,
         bearerFormat = "JWT",
