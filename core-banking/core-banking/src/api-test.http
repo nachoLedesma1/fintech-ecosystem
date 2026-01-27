@@ -45,12 +45,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsI
 ### 1. Transferir Dinero
 POST http://localhost:8080/api/core/transactions/transfer
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2OTQ2NjUwNSwiZXhwIjoxNzY5NTUyOTA1fQ.nw4eylNtQDu5y8fiWJ5vASsYwO5X0JAWwxAuygQ7D88
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJpZ25hY2lvQGFkbWluLmNvbSIsImlhdCI6MTc2OTQ3NTI5NywiZXhwIjoxNzY5NTYxNjk3fQ.CyCHAwwACFwPvng2pXCygJInGIPvIpQFUjichSIQgVs
 
 {
-  "sourceCbu": "1768945902491129386148",
-  "destinationCbu": "1768949494197346134556",
-  "amount": 1.00
+  "sourceCbu": "1769469910157567942570",
+  "destinationCbu": "1769469903770248448570",
+  "amount": 1
 }
 
 ### Ver Historial de Transacciones

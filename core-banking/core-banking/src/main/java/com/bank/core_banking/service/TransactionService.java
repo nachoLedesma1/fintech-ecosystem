@@ -9,6 +9,7 @@ import com.bank.core_banking.model.Transaction;
 import com.bank.core_banking.model.TransactionType;
 import com.bank.core_banking.repository.AccountRepository;
 import com.bank.core_banking.repository.TransactionRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.web.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -25,6 +26,8 @@ public class TransactionService {
 
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    private final CurrencyExchangeService exchangeService;
+    private final NotificationHelper notificationHelper;
     //creamos cliente nativo
     private final RestClient restClient = RestClient.create();
 
@@ -90,30 +93,32 @@ public class TransactionService {
             throw new RuntimeException("Saldo insuficiente");
         }
 
-        // Validar monedas iguales (No permitimos transferir USD a ARS por ahora)
-        if (destinationAccount.getCurrency() != sourceAccount.getCurrency()) {
-            throw new RuntimeException("No se pueden transferir entre monedas distintas");
-        }
+        // Calculamos cuánto recibe el destino basado en las monedas de ambos
+        BigDecimal amountToReceive = exchangeService.convert(
+                request.getAmount(),            // Monto original
+                sourceAccount.getCurrency(),    // Moneda Origen
+                destinationAccount.getCurrency()// Moneda Destino
+        );
 
         //Descontar al origen
         sourceAccount.setBalance(sourceAccount.getBalance().subtract(request.getAmount()));
 
         //Sumar al destino
-        destinationAccount.setBalance(destinationAccount.getBalance().add(request.getAmount()));
+        destinationAccount.setBalance(destinationAccount.getBalance().add(amountToReceive));
 
         //Crear registro para el que envía (Resta)
         Transaction debitTx = Transaction.builder()
                 .type(TransactionType.TRANSFER_SENT)
                 .amount(request.getAmount().negate()) // Guardamos negativo para visualización
-                .description("Transferencia a " + request.getDestinationCbu())
+                .description("Transferencia a " + request.getDestinationCbu() + " (" + sourceAccount.getCurrency() + ")")
                 .account(sourceAccount)
                 .build();
 
         // Crear registro para el que recibe (Suma)
         Transaction creditTx = Transaction.builder()
                 .type(TransactionType.TRANSFER_RECEIVED)
-                .amount(request.getAmount())
-                .description("Transferencia de " + request.getSourceCbu())
+                .amount(amountToReceive)
+                .description("Transferencia de " + request.getSourceCbu() + " (" + destinationAccount.getCurrency() + ")")
                 .account(destinationAccount)
                 .build();
 
@@ -123,28 +128,10 @@ public class TransactionService {
         transactionRepository.save(debitTx);
         transactionRepository.save(creditTx);
 
+
+
         //servicio de notifiaciones
-        try {
-            //Preparamos los datos
-            String nombreDestino = destinationAccount.getAlias() != null
-                    ? destinationAccount.getAlias()       // Si tiene alias, úsalo
-                    : destinationAccount.getCbu();
-            EmailRequest email = new EmailRequest();
-            email.setTo(sourceAccount.getUser().getEmail());//estaba "nacho@mail.com" en vez de lo que está ahora
-            email.setSubject("Transferencia Exitosa");
-            email.setBody("Has transferido $" + request.getAmount() + " a " + nombreDestino);
-
-            // Hacemos la llamada HTTP manual al puerto 8081
-            restClient.post()
-                    .uri(notificationUrl + "/notifications/send")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(email)
-                    .retrieve()
-                    .toBodilessEntity(); // "Manda y olvida" (No esperamos respuesta)
-
-        } catch (Exception e) {
-            System.err.println("⚠️ No se pudo enviar la notificación: " + e.getMessage());
-        }
+        notificationHelper.sendNotification(sourceAccount, destinationAccount, request.getAmount());
 
         //acá van los logs
         try {
@@ -154,7 +141,9 @@ public class TransactionService {
             AuditRequest audit = new AuditRequest();
             audit.setEventType("TRANSFERENCIA_ENVIADA");
             audit.setUsername(sourceAccount.getUser().getUsername()); // O getEmail()
-            audit.setMessage("Transferencia exitosa de $" + request.getAmount() + " a " + nombreDestino);
+            audit.setMessage("Transferencia: " + request.getAmount() + " " + sourceAccount.getCurrency() +
+                    " -> " + amountToReceive + " " + destinationAccount.getCurrency() +
+                    " a " + nombreDestino);
 
             restClient.post()
                     .uri(auditUrl + "/audit")

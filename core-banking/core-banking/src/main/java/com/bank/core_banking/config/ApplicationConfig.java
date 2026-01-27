@@ -26,11 +26,14 @@ public class ApplicationConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        // Pasamos el servicio en el constructor.
-        // Esto elimina la necesidad de usar 'setUserDetailsService'
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService());
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
+        //Configuramos quién busca los usuarios
+        authProvider.setUserDetailsService(userDetailsService());
+
+        // Configuramos quién encripta las contraseñas
         authProvider.setPasswordEncoder(passwordEncoder());
+
         return authProvider;
     }
 
