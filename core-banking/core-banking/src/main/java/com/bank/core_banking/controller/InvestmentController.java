@@ -22,4 +22,9 @@ public class InvestmentController {
         return ResponseEntity.ok(newInvestment);
     }
 
+    @GetMapping
+    public java.util.List<Investment> getMyInvestments(Authentication auth) {
+        return investmentService.getMyInvestments(auth.getName());
+    }
+
 }

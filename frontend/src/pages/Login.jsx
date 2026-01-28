@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import api from '../api/axiosConfig';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -15,14 +15,14 @@ const Login = () => {
         try {
             // 1. Llamamos al endpoint de Auth
             const response = await api.post('/auth/login', { email, password });
-            
+
             // 2. Guardamos el token en el navegador
             const { token } = response.data;
             localStorage.setItem('token', token);
 
             // 3. Redirigimos al Dashboard (que crearemos luego)
             navigate('/dashboard');
-            
+
         } catch (err) {
             console.error(err);
             setError('Credenciales inválidas o error de conexión');
@@ -45,8 +45,8 @@ const Login = () => {
                 <form onSubmit={handleLogin} className="space-y-6">
                     <div>
                         <label className="block text-gray-400 text-sm font-bold mb-2">Email</label>
-                        <input 
-                            type="email" 
+                        <input
+                            type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             className="w-full px-4 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -56,8 +56,8 @@ const Login = () => {
 
                     <div>
                         <label className="block text-gray-400 text-sm font-bold mb-2">Contraseña</label>
-                        <input 
-                            type="password" 
+                        <input
+                            type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="w-full px-4 py-2 bg-gray-700 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -65,12 +65,18 @@ const Login = () => {
                         />
                     </div>
 
-                    <button 
+                    <button
                         type="submit"
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-200"
                     >
                         Ingresar
                     </button>
+                    <div className="mt-6 text-center text-sm text-gray-400">
+                        ¿No tienes cuenta?{' '}
+                        <Link to="/register" className="text-blue-400 hover:text-blue-300 font-bold transition">
+                            Regístrate aquí
+                        </Link>
+                    </div>
                 </form>
             </div>
         </div>

@@ -15,6 +15,7 @@ public class AccountResponseDTO {
     private String number;
     private BigDecimal balance;
     private String currency;
+    private String alias;
 
     // 💡 Este es el constructor clave que usa tu Controlador
     public AccountResponseDTO(Account account) {
@@ -24,6 +25,9 @@ public class AccountResponseDTO {
 
         // Si tu moneda es un Enum, usa .name(). Si es String, quita el .name()
         this.currency = account.getCurrency().toString();
+
+        // Agregamos el Alias puede ser nulo (si no resgistró un alias)
+        this.alias = account.getAlias();
     }
 
 }
