@@ -93,6 +93,13 @@ const Dashboard = () => {
                 </button>
 
                 <button
+                    onClick={() => navigate('/cards')}
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-indigo-600/20 flex items-center gap-2 transition"
+                >
+                    💳 Tarjetas
+                </button>
+
+                <button
                     onClick={() => navigate('/investments')}
                     className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-3 rounded-lg font-bold shadow-lg shadow-purple-600/20 flex items-center gap-2 transition"
                 >
