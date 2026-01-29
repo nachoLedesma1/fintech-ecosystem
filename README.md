@@ -1,74 +1,87 @@
-# 🏦 Core Banking API
+# 🏦 Fintech Ecosystem - Full Stack Banking System
 
-API RESTful para un sistema bancario simulado, desarrollada con **Java 21** y **Spring Boot 3**.
-Este proyecto simula las operaciones nucleares de un banco digital, incluyendo autenticación segura, manejo de cuentas, transferencias transaccionales y productos de inversión.
+Sistema bancario digital completo, seguro y escalable. Desarrollado con una arquitectura de **Microservicios** containerizada, combinando la robustez de **Java Spring Boot** con una experiencia de usuario moderna en **React**.
+
+![Java](https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
 ## 🚀 Características Principales
 
-### 🔐 Seguridad & Usuarios
-* **Registro y Login:** Autenticación vía **JWT (JSON Web Tokens)**.
-* **Protección de Rutas:** Configuración de Spring Security para proteger endpoints sensibles.
-* **Encriptación:** Contraseñas hasheadas con BCrypt.
+### 🔐 Seguridad & UX
+* **Autenticación JWT:** Registro y Login seguro con persistencia de sesión.
+* **Privacy Mode:** Enmascaramiento de datos sensibles (saldos y números de tarjeta) en el Frontend para evitar *visual hacking*.
+* **Protección de Rutas:** Navegación segura que restringe el acceso a usuarios no autenticados.
+
+### 💳 Gestión de Productos
+* **Cuentas Multi-moneda:** Cajas de ahorro en **Pesos (ARS)** y **Dólares (USD)**.
+* **Tarjetas Interactivas 3D:**
+    * Emisión de tarjetas de Débito y Crédito.
+    * Animación "Flip" (Giro 180°) para ver el dorso y CVV.
+    * Generación algorítmica de PAN, Vencimiento y CVV.
 
 ### 💸 Transaccionalidad
-* **Transferencias:** Envío de dinero entre cuentas con validación **ACID** (Atomicidad) para asegurar la integridad de los fondos.
-* **Alias (CBU):** Sistema para asociar nombres amigables (ej: `nacho.dev`) a cuentas bancarias.
-* **Historial:** Registro inmutable de todas las transacciones.
+* **Transferencias:** Movimiento de fondos en tiempo real entre cuentas (CBU/Alias) con validación ACID.
+* **Depósitos:** Simulación de ingreso de dinero (Cash-in) integrado.
+* **Historial Inteligente:** Visualización clara de ingresos (Verde) y egresos (Rojo).
 
 ### 📈 Inversiones & Automatización
-* **Plazos Fijos:** Módulo para crear inversiones con cálculo de intereses.
-* **Motor Automático (Scheduler):** Proceso batch (`@Scheduled`) que corre diariamente para detectar inversiones vencidas y acreditar ganancias automáticamente.
-
-### 📒 Extras
-* **Agenda de Contactos:** Gestión de destinatarios frecuentes.
-* **Documentación Viva:** Integración con **Swagger / OpenAPI** para probar endpoints visualmente.
+* **Plazos Fijos:** Simulador de rendimiento con Tasa Nominal Anual (TNA) configurable.
+* **Investment Robot (Scheduler):** Proceso batch (`@Scheduled`) en el backend que detecta inversiones vencidas y acredita capital + intereses automáticamente sin intervención humana.
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## 🛠️ Arquitectura de Microservicios
 
-* **Lenguaje:** Java 21
-* **Framework:** Spring Boot 3.4.1
-* **Base de Datos:** PostgreSQL
-* **Seguridad:** Spring Security + JWT
-* **Documentación:** SpringDoc OpenApi (Swagger)
-* **Herramientas:** Maven, Lombok
+El sistema ya no es un monolito. Se ha evolucionado a una arquitectura distribuida orquestada con **Docker Compose**:
 
----
-
-## 📖 Documentación de la API (Swagger)
-
-Una vez iniciada la aplicación, puedes explorar y probar todos los endpoints en:
-
-👉 **[http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)**
+1.  **API Gateway:** Puerta de entrada única que enruta el tráfico y gestiona la seguridad perimetral.
+2.  **Core Banking Service:** Lógica de negocio principal (Cuentas, Transacciones, Inversiones).
+3.  **Audit Service:** Microservicio asíncrono que registra eventos de seguridad.
+4.  **Notification Service:** Servicio encargado de la comunicación con el usuario.
+5.  **Frontend SPA:** Aplicación React (Vite) consumiendo la API a través del Gateway.
 
 ---
 
-## ⚙️ Instalación y Ejecución
+## ⚙️ Instalación y Despliegue (Docker)
+
+La forma más sencilla de probar el ecosistema completo es utilizando Docker.
 
 1.  **Clonar el repositorio:**
     ```bash
-    git clone [https://github.com/TU_USUARIO/core-banking.git](https://github.com/TU_USUARIO/core-banking.git)
+    git clone [https://github.com/nachoLedesma1/fintech-ecosystem.git](https://github.com/nachoLedesma1/fintech-ecosystem.git)
+    cd fintech-ecosystem
     ```
 
-2.  **Configurar Base de Datos:**
-    Asegúrate de tener PostgreSQL corriendo y crea una base de datos llamada `core_banking`. Actualiza el archivo `src/main/resources/application.properties` con tus credenciales.
-
-3.  **Ejecutar:**
+2.  **Levantar el entorno:**
     ```bash
-    ./mvnw spring-boot:run
+    docker-compose up -d --build
     ```
+    *Esto levantará la Base de Datos, los 4 Microservicios Java y el Frontend React.*
+
+3.  **Acceder:**
+    * 💻 **Frontend:** [http://localhost:5173](http://localhost:5173)
+    * 📄 **Swagger API:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) (Vía Gateway)
 
 ---
 
-## 🚧 Próximos Pasos (Roadmap & Arquitectura Futura)
+## 📖 Tecnologías Detalladas
 
-El proyecto está diseñado para evolucionar de un Monolito Modular a una arquitectura de **Microservicios**. Las próximas implementaciones planificadas son:
+* **Backend:** Java 21, Spring Boot 3.4, Spring Security, Spring Cloud Gateway, JPA/Hibernate.
+* **Frontend:** React 18, Vite, Tailwind CSS, Axios, React Router DOM.
+* **Datos:** PostgreSQL 15.
+* **DevOps:** Docker, Docker Compose, Git.
 
-* [ ] **Notification Service:** Microservicio dedicado para envío de correos electrónicos (bienvenida, alertas de seguridad, comprobantes de transferencia) usando RabbitMQ/Kafka.
-* [ ] **Audit Service:** Servicio independiente para registrar logs de seguridad y actividad de usuarios (Inicios de sesión, cambios de clave) en una base de datos NoSQL (MongoDB).
-* [ ] **Despliegue Cloud:** Configuración de CI/CD para deploy automático en Railway/AWS.
-* [ ] **Containerización:** Dockerización de los servicios para orquestación con Kubernetes.
+---
+
+## 🚧 Roadmap (Próximos Pasos)
+
+* [ ] Implementación de Tests Unitarios (JUnit 5 + Mockito).
+* [ ] Despliegue en Cloud (AWS/Render).
+* [ ] Integración de 2FA (Doble Factor).
 
 ---
 **Autor:** [Ignacio Agustín Ledesma] - 2026
