@@ -3,7 +3,10 @@ package com.bank.audit_service.controller;
 import com.bank.audit_service.model.AuditLog;
 import com.bank.audit_service.repository.AuditRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/audit")
@@ -19,6 +22,12 @@ public class AuditController {
 
         // Imprimimos en consola para verlo nosotros también
         System.out.println("📝 AUDITORÍA GUARDADA: [" + savedLog.getEventType() + "] " + savedLog.getMessage());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<AuditLog>> getAllLogs() {
+        // Devuelve todos los registros, idealmente ordenados por fecha descendente si quisieras
+        return ResponseEntity.ok(auditRepository.findAll());
     }
 
 }

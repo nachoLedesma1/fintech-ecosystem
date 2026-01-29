@@ -38,7 +38,7 @@ public class AccountController {
     public ResponseEntity<String> setAlias(@RequestBody AliasRequest request,
                                            Authentication authentication) {
 
-        transactionService.setAlias(request.getCbu(), request.getAlias(), authentication.getName());
+        transactionService.setAlias(request.getCbu(), request.getAlias(), authentication.getName(), authentication.getName());
         return ResponseEntity.ok("Alias creado exitosamente: " + request.getAlias());
     }
 

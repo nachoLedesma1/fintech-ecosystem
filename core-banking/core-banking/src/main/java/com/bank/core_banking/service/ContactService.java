@@ -8,6 +8,7 @@ import com.bank.core_banking.repository.AccountRepository;
 import com.bank.core_banking.repository.ContactRepository;
 import com.bank.core_banking.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +20,12 @@ public class ContactService {
     private final ContactRepository contactRepository;
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final AuditClient auditClient;
 
     public void addContact(ContactRequest request, String userEmail) {
+
+        //usuario logeado
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         // Identificar al usuario dueño de la agenda
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -41,6 +46,8 @@ public class ContactService {
                 .user(user)
                 .build();
 
+        auditClient.log("CONTACT_ADD", username, "Nuevo contacto agregado: " + request.getName());
+
         contactRepository.save(contact);
     }
 
@@ -52,7 +59,12 @@ public class ContactService {
     }
 
     public void deleteContact(Long contactId) {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         contactRepository.deleteById(contactId);
+
+        auditClient.log("CONTACT_DELETE", username, "Contacto eliminado (ID: " + contactId + ")");
+
     }
 
 }

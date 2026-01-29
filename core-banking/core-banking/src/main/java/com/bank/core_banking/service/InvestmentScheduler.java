@@ -22,6 +22,7 @@ public class InvestmentScheduler {
     private final InvestmentRepository investmentRepository;
     private final AccountRepository accountRepository;
     private final TransactionRepository transactionRepository;
+    private final AuditClient auditClient;
 
     // Se ejecuta todos los días a las 00:00
     // Cron: Seg Min Hora Dia Mes DiaSemana
@@ -29,14 +30,18 @@ public class InvestmentScheduler {
     @Transactional //Si falla un pago en el lote, hace rollback de ese lote
     public void processInvestments() {
 
+        auditClient.log("SCHEDULER_START", "SYSTEM", "Iniciando barrido de inversiones vencidas...");
         List<Investment> expiredInvestments = investmentRepository.findReadyToPay();
         int count = 0;
 
         for (Investment investment : expiredInvestments) {
             payInvestment(investment);
+            auditClient.log("INVESTMENT_PAYOUT", "SYSTEM",
+                    "Pago automático de inversión ID " + investment.getId() + " al usuario " + investment.getAccount().getUser().getEmail());
             count++;
         }
 
+        auditClient.log("SCHEDULER_END", "SYSTEM", "Proceso finalizado. Inversiones pagadas: " + count);
         System.out.println("ROBOT FINALIZADO: Se pagaron " + count + " inversiones.");
     }
 

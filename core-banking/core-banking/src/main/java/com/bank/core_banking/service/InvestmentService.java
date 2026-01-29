@@ -20,6 +20,7 @@ public class InvestmentService {
 
     private final InvestmentRepository investmentRepository;
     private final AccountRepository accountRepository;
+    private final AuditClient auditClient;
 
     // Definimos una Tasa Nominal Anual (TNA) fija del 70% (0.70) para simplificar
     private static final BigDecimal TNA = new BigDecimal("0.70");
@@ -71,6 +72,8 @@ public class InvestmentService {
                 .active(true)
                 .account(account)
                 .build();
+
+        auditClient.log("INVESTMENT_CREATED", userEmail, "Plazo fijo creado por $" + request.getAmount());
 
         return investmentRepository.save(investment);
     }

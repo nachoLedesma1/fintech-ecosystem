@@ -19,6 +19,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final AuditClient auditClient;
 
     public AuthenticationResponse register(RegisterRequest request) {
         var user = User.builder()
@@ -31,7 +32,13 @@ public class AuthService {
 
         // Al registrarse, devolvemos el token de una vez para que no tenga que loguearse
         var jwtToken = jwtService.generateToken(user);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+
+        auditClient.log("REGISTER_USER", request.getEmail(), "Usuario registrado exitosamente");
+
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .role(user.getRole().name())
+                .build();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -51,6 +58,9 @@ public class AuthService {
         var jwtToken = jwtService.generateToken(user);
 
         // Lo devolvemos
-        return AuthenticationResponse.builder().token(jwtToken).build();
+        return AuthenticationResponse.builder()
+                .token(jwtToken)
+                .role(user.getRole().name())
+                .build();
     }
 }

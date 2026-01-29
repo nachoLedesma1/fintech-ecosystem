@@ -28,6 +28,7 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final CurrencyExchangeService exchangeService;
     private final NotificationHelper notificationHelper;
+    private final AuditClient auditClient;
     //creamos cliente nativo
     private final RestClient restClient = RestClient.create();
 
@@ -61,6 +62,8 @@ public class TransactionService {
         // Guardar cambios (Spring guarda la cuenta actualizada y la transacción nueva)
         transactionRepository.save(transaction);
         accountRepository.save(account);
+
+        auditClient.log("DEPOSIT", request.getCbu(), "Depósito recibido de $" + request.getAmount());
 
         return transaction;
     }
@@ -174,7 +177,7 @@ public class TransactionService {
         return transactionRepository.findByAccountIdOrderByTimestampDesc(account.getId());
     }
 
-    public void setAlias(String cbu, String alias, String userEmail) {
+    public void setAlias(String cbu, String alias, String userEmail, String username) {
         //Validar formato del alias (ej: letras y puntos)
         if (!alias.matches("^[a-zA-Z0-9.]+$")) {
             throw new RuntimeException("El alias solo puede tener letras, números y puntos");
@@ -198,6 +201,7 @@ public class TransactionService {
         //Guardar
         account.setAlias(alias);
         accountRepository.save(account);
+        auditClient.log("ALIAS_UPDATE", username, "Alias de cuenta " + cbu + " cambiado a: " + alias);
     }
 
 }

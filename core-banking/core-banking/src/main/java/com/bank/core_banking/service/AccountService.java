@@ -18,6 +18,7 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final UserRepository userRepository;
+    private final AuditClient auditClient;
 
     public Account createAccount(CreateAccountRequest request, String userEmail) {
         //Buscar al usuario en la DB (el email viene del Token)
@@ -37,6 +38,8 @@ public class AccountService {
                 .balance(BigDecimal.ZERO) // Empieza pobre :(
                 .transactionLimit(limit)
                 .build();
+
+        auditClient.log("CREATE_ACCOUNT", userEmail, "Cuenta creada en " + request.getCurrency());
 
         return accountRepository.save(account);
     }

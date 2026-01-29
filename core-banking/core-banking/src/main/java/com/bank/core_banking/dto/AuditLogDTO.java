@@ -1,5 +1,4 @@
 package com.bank.core_banking.dto;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,9 +8,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthenticationResponse {
+public class AuditLogDTO {
 
-    private String token;
-    private String role;
+    private String eventType;
+    private String username;
+    private String message;
 
 }

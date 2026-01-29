@@ -7,6 +7,7 @@ import Contacts from './pages/Contacts';
 import Investments from './pages/Investments';
 import Register from './pages/Register';
 import Card from './pages/Cards';
+import AdminPanel from './pages/AdminPanel';
 
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
         <Route path="/investments" element={<Investments />} />
         <Route path="/register" element={<Register />} />
         <Route path="/cards" element={<Card />} />
+        <Route path="/admin" element={<AdminPanel />} />
     
         {/* Redireccionar cualquier ruta desconocida al Login */}
         <Route path="*" element={<Navigate to="/" />} />

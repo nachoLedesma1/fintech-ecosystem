@@ -6,6 +6,7 @@ import com.bank.core_banking.model.Card;
 import com.bank.core_banking.repository.AccountRepository;
 import com.bank.core_banking.repository.CardRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,6 +19,7 @@ public class CardService {
 
     private final CardRepository cardRepository;
     private final AccountRepository accountRepository;
+    private final AuditClient auditClient;
 
     public Card createCard(CardRequest request, String userEmail) {
         // Buscar la cuenta y validar dueño
@@ -46,10 +48,16 @@ public class CardService {
                 .account(account)
                 .build();
 
+        auditClient.log("CARD_ISSUED", userEmail, "Nueva tarjeta " + request.getType() + " emitida");
+
         return cardRepository.save(card);
     }
 
     public java.util.List<Card> getMyCards(String email) {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        auditClient.log("CARDS_VIEWED", username, "Usuario consultó sus tarjetas y datos sensibles");
         return cardRepository.findByAccount_User_Email(email);
     }
 

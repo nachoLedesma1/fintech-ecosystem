@@ -39,7 +39,7 @@ public class TransactionController {
 
     @PutMapping("/alias")
     public ResponseEntity<String> updateAlias(@RequestBody AliasRequest request, Authentication auth) {
-        transactionService.setAlias(request.getCbu(), request.getAlias(), auth.getName());
+        transactionService.setAlias(request.getCbu(), request.getAlias(), auth.getName(), auth.getName());
         return ResponseEntity.ok("Alias actualizado correctamente");
     }
 

@@ -6,12 +6,15 @@ import CreateAccountModal from '../components/CreateAccountModal';
 import DepositModal from '../components/DepositModal';
 
 const Dashboard = () => {
+    const navigate = useNavigate();
+    const role = localStorage.getItem('role');
+
     const [user, setUser] = useState(null);
     const [accounts, setAccounts] = useState([]);
-    const navigate = useNavigate();
     const [editingAccount, setEditingAccount] = useState(null);
     const [showCreateAccount, setShowCreateAccount] = useState(false);
     const [showDeposit, setShowDeposit] = useState(false);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -105,6 +108,15 @@ const Dashboard = () => {
                 >
                     📈 Inversiones
                 </button>
+                {/* Botón solo para admin */}
+                {role === 'ADMIN' && (
+                    <button
+                        onClick={() => navigate('/admin')}
+                        className="bg-red-600/20 hover:bg-red-600/40 text-red-500 border border-red-500/50 px-6 py-3 rounded-lg font-bold flex items-center gap-2 transition"
+                    >
+                        🛡️ Panel Admin
+                    </button>
+                )}
             </div>
 
             {/* Tarjeta de Información */}

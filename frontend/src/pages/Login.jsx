@@ -13,14 +13,15 @@ const Login = () => {
         setError('');
 
         try {
-            // 1. Llamamos al endpoint de Auth
+            // Llamamos al endpoint de Auth
             const response = await api.post('/auth/login', { email, password });
 
-            // 2. Guardamos el token en el navegador
-            const { token } = response.data;
+            // Guardamos el token en el navegador
+            const { token, role } = response.data;
             localStorage.setItem('token', token);
+            localStorage.setItem('role', role);
 
-            // 3. Redirigimos al Dashboard (que crearemos luego)
+            // Redirigimos al Dashboard 
             navigate('/dashboard');
 
         } catch (err) {
