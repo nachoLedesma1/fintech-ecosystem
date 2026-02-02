@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import api from '../api/axiosConfig';
+import apiCore from '../api/axiosConfig';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
@@ -14,7 +14,8 @@ const Login = () => {
 
         try {
             // Llamamos al endpoint de Auth
-            const response = await api.post('/auth/login', { email, password });
+            const response = await apiCore.post('/auth/login', { email, password });
+            console.log("Respuesta de login:", response.data);
 
             // Guardamos el token en el navegador
             const { token, role } = response.data;

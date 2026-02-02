@@ -16,18 +16,32 @@ public class SecurityAuditListener {
     // Login exitoso
     @EventListener
     public void onSuccess(AuthenticationSuccessEvent event) {
-        String username = event.getAuthentication().getName();
-        auditClient.log("LOGIN_SUCCESS", username, "Inicio de sesión exitoso");
+        try {
+            if (event.getAuthentication() != null) {
+                String username = event.getAuthentication().getName();
+                auditClient.log("LOGIN_SUCCESS", username, "Inicio de sesión exitoso");
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Error auditando Login Exitoso: " + e.getMessage());
+        }
     }
 
     // Login fallido  (Contraseña incorrecta, Usuario no existe, etc) ❌
     @EventListener
     public void onFailure(AbstractAuthenticationFailureEvent event) {
-        // Obtenemos el usuario que INTENTARON usar (aunque no exista)
-        String username = (String) event.getAuthentication().getPrincipal();
-        String error = event.getException().getMessage();
+        try {
+            // A veces getPrincipal() devuelve un objeto User, a veces un String, a veces null.
+            // Usamos .toString() para evitar ClassCastException.
+            Object principal = event.getAuthentication().getPrincipal();
+            String username = (principal != null) ? principal.toString() : "UNKNOWN";
 
-        auditClient.log("LOGIN_FAILURE", username, "Fallo al iniciar sesión: " + error);
+            String error = event.getException().getMessage();
+
+            auditClient.log("LOGIN_FAILURE", username, "Fallo al iniciar sesión: " + error);
+        } catch (Exception e) {
+            // Atrapamos cualquier error aquí para que NO rompa el flujo de respuesta al usuario
+            System.err.println("⚠️ Error auditando Login Fallido: " + e.getMessage());
+        }
     }
 
 }
